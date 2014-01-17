@@ -18,20 +18,31 @@
         this.seconds_per_second = playback_speed || 10;
     };
 
-    // timeseries is [[seconds, value], ... ]
-    // callback will be called with the 'current' value during playback
-    global.Animator.prototype.run = function (timeseries, callback) {
-        timeseries = timeseries ? timeseries.slice(0) : [];
-        var start = null;
-        // keeps the value at zero until progress is within a second of the first data point
-        var curr = [timeseries[0][0] - 1, 0]; // TODO careful ... should ensure each item is array of ln 2
-        var progress = 0;
+    // callback will be called during playback with the 'current' values for each of the timeserieses in the order provided
+    // second thru n args should be timeseries. Each ts should follow this format: [[seconds, value], ... ]
+    global.Animator.prototype.run = function (callback) {
+        // accept one or more timeseries streams
+        var streams = Array.prototype.slice.call(arguments, 1);
+        // create a shallow copy of each of the timeseries streams
+        streams = _.map(streams, function (ts) {
+            return ts.slice(0);
+        });
 
         // given a delta in milliseconds (1000ths) return seconds into the timeseries
         var getProgress = _.bind(function (milliseconds_since_start) {
             // running at 10X speed, 10 seconds per every second or 1/100s per 1/1000s real-time
             return milliseconds_since_start / this.seconds_per_second;
         }, this);
+
+        var start = null;
+        var progress = 0;
+
+        // init current results
+        var curr_results = [];
+        _.each(streams, function (ts) {
+            // keeps the value at zero until progress is within a second of the first data point
+            curr_results.push([ts[0][0] - 1, 0]);
+        });
 
         var animLoop = function (timestamp) {
             // timestamp is thousandths of a second
@@ -40,20 +51,24 @@
             }
             progress = getProgress(timestamp - start);
 
-            if (progress > curr[0]) {
-                // progress is now greater than t so pop off t until it is gt progress
-                while (
-                    timeseries.length &&
-                    progress > curr[0]
-                ) {
-                    curr = timeseries.shift();
+            _.each(curr_results, function (curr, idx, results) {
+                var t = curr[0];
+                if (progress > t) {
+                    // progress is now greater than t so pop off t until it is gt progress
+                    while (
+                        streams[idx].length &&
+                        progress > t
+                    ) {
+                        results[idx] = streams[idx].shift();
+                        t = results[idx][0];
+                    }
                 }
-            }
+            });
 
             // call callback with some data ...
-            callback(curr[1]);
+            callback.apply(this, _.map(curr_results, function (curr) { return curr[1]; }));
 
-            if (timeseries.length) {
+            if (_.any(streams, function (ts) { return ts.length; })) {
                 requestAnimFrame(animLoop);
             }
         };

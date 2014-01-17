@@ -64,6 +64,7 @@
         return speed * (180 / this.max_speed);
     };
 
+    // TODO update this method to expect to be called every frame rather than calling requestanimationframe itself
     // each time this is called it resets the queue of needle placements to render with the goal of getting to the angle provided
     Speedometer.fn.updateSpeed = function (speed) {
         var curr_angle = this.current_pos;

@@ -14,7 +14,7 @@
         marker.setMap(map);
 
         return {
-            updateLocation: function (lat, long) {
+            updatePosition: function (lat, long) {
                 var lat_lng = new gmaps.LatLng(lat, long);
                 marker.setPosition(lat_lng);
             }
