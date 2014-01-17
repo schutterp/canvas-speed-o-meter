@@ -1,7 +1,11 @@
-#container {
-    margin: 0 auto;
+.container {
     width: 600px;
+    margin: 10px auto;
+    border: 2px solid #c3c2c2;
     text-align: center;
-    border: black dashed 1px;
     font-family: sans-serif;
+}
+
+#map-canvas {
+    height: 400px;
 }

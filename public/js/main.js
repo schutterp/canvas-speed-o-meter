@@ -1,9 +1,20 @@
 (function (global, data) {
+    var mapper;
+    // init the map
+    google.maps.event.addDomListener(window, 'load', function () {
+        mapper = global.initMap();
+    });
+
+    // init the speedometer
     var speedo = global.speedo = new global.Speedometer(document.getElementById('speedometer'), 400);
+
     global.speed_data = data;
+
+    // init the animator
     global.animator = new global.Animator();
     global.animator.run(data, function (val) {
         speedo.updateSpeed(val);
+        // mapper.updatePosition(lat, lng);
     });
 
 })(window, [

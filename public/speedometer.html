@@ -4,10 +4,15 @@
     </head>
     <body>
 
-        <div id="container">
+        <div class="container">
             <h2>Speedometer</h2>
             <canvas id="speedometer" width="402" height="202">Speedometer</canvas>
         </div>
+        <div id="map-canvas" class="container"></div>
+        <script type="text/javascript"
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJv0LBz4RjIg2yDsA3mtNEWJcw0bbou7c&sensor=true">
+        </script>
+        <script src="js/mapper.js"></script>
         <script src="js/underscore.js"></script>
         <script src="js/animator.js"></script>
         <script src="js/speedometer.js"></script>
