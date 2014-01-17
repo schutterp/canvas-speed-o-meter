@@ -72,7 +72,7 @@
         // fastest the needle can move is 180 degrees per second since our range is half circle
         // create a queue containing enough elements to move from old angle to new angle in increments of 180/s
         if (this.pos_update_q.length) {
-            console.log('not empty ', this.pos_update_q, ' ... curr_angle: ', curr_angle, ' goal_angle: ', goal_angle);
+        //    console.log('not empty ', this.pos_update_q, ' ... curr_angle: ', curr_angle, ' goal_angle: ', goal_angle);
         }
         this.pos_update_q = [goal_angle];
 
@@ -137,67 +137,6 @@
         return step;
     };
 
-    var WorkoutRunner = function (metric, callback, interval) {
-        // calls callback every interval amount of time passing data about the workout at that moment
-
-        // tell me how long it should take or use a speed like 'fast', 'slow', etc
-    };
-
-    // now when we say 'go' the runner will begin running and munching up the array of speed values calling moveNeedle for each one
-
-    // but we only want to call moveNeedle in a requestAnimationFrame callback
-
-    /*
-    with each frame we use the timer to calculate if we've reached a new speed value
-     */
-
-    // shim layer with setTimeout fallback
-    global.requestAnimFrame = (function(){
-        return  global.requestAnimationFrame ||
-            global.webkitRequestAnimationFrame ||
-            global.mozRequestAnimationFrame ||
-            function( callback ){
-                global.setTimeout(callback, 1000 / 60);
-            };
-    })();
-
-//    var test_speeds = [
-//        [1, 10],
-//        [2, 10],
-//        [3, 12],
-//        [4, 15],
-//        [5, 20],
-//        [10, 15],
-//        [11, ]
-//    ];
-
-    var test_speeds = _.map(_.range(50), function (time) {
-        return [
-            time,
-            Math.random() * 45
-        ];
-    });
-
-    var init = function (speed_array) {
-        var speedo = global.speedo = new Speedometer(document.getElementById('speedometer'), 400);
-        var iter = 0;
-        (function animloop(timestamp){
-            if (iter < speed_array.length) {
-                // skip ahead to the most relevant timestamp
-
-                //requestAnimFrame(animloop);
-                if (timestamp / 200 > speed_array[iter][0]) {
-                    speedo.updateSpeed(speed_array[iter][1]);
-                    iter++;
-                }
-                requestAnimFrame(animloop);
-            }
-        })(0);
-    };
-
-    init(test_speeds);
-
-    global.init = init;
-    global.test_speeds = test_speeds;
+    global.Speedometer = Speedometer;
 
 })(window);
