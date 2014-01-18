@@ -1,0 +1,22 @@
+{
+  "name": "canvas-speedometer",
+  "version": "0.0.0",
+  "homepage": "https://github.com/schutterp/canvas-speed-o-meter",
+  "authors": [
+    "Ryan Schutte <ryan.schutte@mapmyfitness.com>"
+  ],
+  "description": "An implementation of a canvas speedometer using a data animator",
+  "main": "public/index.html",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "timeseries-animator": "git://github.com/schutterp/timeseries-animator.git"
+  }
+}
