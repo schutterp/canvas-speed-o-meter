@@ -1,5 +1,17 @@
 (function (global) {
 
+    // TODO: remove reliance on this since the animator will now do it for us
+    // shim layer with setTimeout fallback
+    global.requestAnimFrame = (function(){
+        return  global.requestAnimationFrame ||
+            global.webkitRequestAnimationFrame ||
+            global.mozRequestAnimationFrame ||
+            function( callback ){
+                global.setTimeout(callback, 1000 / 60);
+            };
+    })();
+
+
     var Speedometer = function (canvas, speedo_width) {
         if (!this instanceof Speedometer) {
             return new Speedometer(arguments);
@@ -107,12 +119,12 @@
     Speedometer.fn.animateSpeedometer = function () {
         var q = this.pos_update_q;
         var that = this;
-        (function animloop(timestamp){
+        (function animloop(){
             if (q.length && !that.building_q) {
                 requestAnimFrame(animloop);
                 that.moveNeedle(q.pop());
             }
-        })(0);
+        })();
     };
     Speedometer.fn.getStep = function (total_movement, delta) {
         var step = 1;
