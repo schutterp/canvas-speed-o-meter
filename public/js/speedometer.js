@@ -1,17 +1,5 @@
 (function (global) {
 
-    // TODO: remove reliance on this since the animator will now do it for us
-    // shim layer with setTimeout fallback
-    global.requestAnimFrame = (function(){
-        return  global.requestAnimationFrame ||
-            global.webkitRequestAnimationFrame ||
-            global.mozRequestAnimationFrame ||
-            function( callback ){
-                global.setTimeout(callback, 1000 / 60);
-            };
-    })();
-
-
     var Speedometer = function (canvas, speedo_width) {
         if (!this instanceof Speedometer) {
             return new Speedometer(arguments);
@@ -26,9 +14,7 @@
         this.max_speed = 50;
         this.speed = 0;
         this.current_pos = this.getAngle(this.speed);
-        this.pos_update_q = [];
         this.moveNeedle(this.current_pos);
-
     };
 
     Speedometer.fn = Speedometer.prototype;
@@ -76,78 +62,36 @@
         return speed * (180 / this.max_speed);
     };
 
-    // TODO update this method to expect to be called every frame rather than calling requestanimationframe itself
-    // each time this is called it resets the queue of needle placements to render with the goal of getting to the angle provided
     Speedometer.fn.updateSpeed = function (speed) {
         var curr_angle = this.current_pos;
         var goal_angle = this.getAngle(speed);
-        var total_change = Math.abs(curr_angle - goal_angle);
-        // fastest the needle can move is 180 degrees per second since our range is half circle
-        // create a queue containing enough elements to move from old angle to new angle in increments of 180/s
-        if (this.pos_update_q.length) {
-        //    console.log('not empty ', this.pos_update_q, ' ... curr_angle: ', curr_angle, ' goal_angle: ', goal_angle);
-        }
-        this.pos_update_q = [goal_angle];
+        var diff = Math.abs(curr_angle - goal_angle);
 
-        while (Math.abs(curr_angle - goal_angle) > 0) {
-            var delta = Math.abs(curr_angle - goal_angle);
-            this.building_q = true;
-            // slow down as it gets closer
-            var step = this.getStep(total_change, delta);
-            if (step < 0.2) {
-                step = 0.2;
+        var getDelta = function (positive_inc, diff) {
+            var result = 0;
+            if (!diff) {
+                return result;
             }
-            if (curr_angle < goal_angle) {
-                goal_angle = goal_angle - step;
-                // check if we went too far
-                if (curr_angle > goal_angle) {
-                    goal_angle = curr_angle;
-                }
+            else if (diff < 1) {
+                result = 0.25;
             }
-            else if (curr_angle > goal_angle) {
-                goal_angle = goal_angle + step;
-                // check if we went too far
-                if (curr_angle < goal_angle) {
-                    goal_angle = curr_angle;
-                }
+            else if (diff < 3) {
+                result = 0.5;
             }
-            this.pos_update_q.push(goal_angle);
-        }
-        this.building_q = false;
-        this.animateSpeedometer();
-    };
-    Speedometer.fn.animateSpeedometer = function () {
-        var q = this.pos_update_q;
-        var that = this;
-        (function animloop(){
-            if (q.length && !that.building_q) {
-                requestAnimFrame(animloop);
-                that.moveNeedle(q.pop());
+            else if (diff < 5) {
+                result = 1;
             }
-        })();
-    };
-    Speedometer.fn.getStep = function (total_movement, delta) {
-        var step = 1;
-        var movement_remaining = Math.abs(total_movement - delta);
-        // accelerating needle when starting movement so angles should get closer together as end of q is reached
-        // delta is close to total change
-        // 50 apart and delta is 50 move .25
-        // 50 apart and delta is 49.75 move .5
-        // 50 apart and delta is 49.25 move 1
-        if (movement_remaining === 0) {
-            step = 0;
-        }
-        else if (movement_remaining / total_movement > .95) {
-            step = 0.5;
-        }
-        else {
-            // decelerating needle when near goal angle so angles should start closer together at beginning of q
-            // delta is close to 0
-            if (delta < 5) {
-                step = delta / 8;
+            else {
+                result = 2;
             }
-        }
-        return step;
+            if (!positive_inc) {
+                result = -1 * result;
+            }
+            return result
+        };
+
+        var delta = getDelta(curr_angle < goal_angle, diff);
+        this.moveNeedle(curr_angle + delta);
     };
 
     global.Speedometer = Speedometer;

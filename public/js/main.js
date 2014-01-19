@@ -11,7 +11,7 @@
     global.speed_data = speed_data;
 
     // init the animator
-    var playback_speed = 'fast';
+    var playback_speed = 'normal';
     global.animator = new global.Animator(playback_speed);
     global.animator.run(function (speed, pos) {
         speedo.updateSpeed(speed);
