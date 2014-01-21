@@ -4,6 +4,8 @@
     google.maps.event.addDomListener(window, 'load', function () {
         mapper = global.initMap();
 
+        mapper.addPolyLine(pos_data);
+
         // init the speedometer
         var speedo = global.speedo = new global.Speedometer(document.getElementById('speedometer'), 400);
 
